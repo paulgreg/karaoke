@@ -1,25 +1,29 @@
 import React, { useState } from 'react'
-import LyricsPlayer from './Lyrics'
+import LyricsPlayer from './LyricsPlayer'
 
 const SongSelector = () => {
     const [audioSrc, setAudioSrc] = useState<string>()
-    const [artist, setArtist] = useState<string>()
-    const [song, setSong] = useState<string>()
+    const [fileName, setFileName] = useState<string>()
     const [error, setError] = useState('')
     const [currentTime, setCurrentTime] = useState<number>(0)
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAudioSrc(undefined)
+
         const files = e.target.files
-        if (files && files.length > 0) {
+        if (files?.length) {
             const file = files[0]
             try {
-                setAudioSrc(URL.createObjectURL(file))
                 const { name } = file
-                const n = name.split('.')
-                const [artist, song] = n[0].split('-')
-                if (artist) setArtist(artist)
-                if (song) setSong(song)
+                const [n] = name.split('.')
+                setFileName(n)
                 setError('')
+
+                const src = URL.createObjectURL(file)
+                setTimeout(() => {
+                    // Add a slight delay to ensure the component fully resets
+                    setAudioSrc(src)
+                }, 0)
             } catch (err) {
                 setError('Failed to extract metadata')
                 console.error(err)
@@ -34,10 +38,12 @@ const SongSelector = () => {
     return (
         <div>
             <div>
-                <input type="file" accept=".mp3,.m4a" onChange={handleFileChange} />
+                <input type="file" accept=".mp3,.m4a,ogg" onChange={handleFileChange} />
             </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <small>artist - song name.mp3/m4a</small>
+            <p>
+                {error && <strong style={{ color: 'red' }}>{error}</strong>}
+                {!error && <small>artist - song name.mp3/m4a/ogg</small>}
+            </p>
             <div>
                 {audioSrc && (
                     <audio controls onTimeUpdate={handleTimeUpdate}>
@@ -46,7 +52,7 @@ const SongSelector = () => {
                     </audio>
                 )}
             </div>
-            <LyricsPlayer artist={artist} song={song} currentTime={currentTime} />
+            <LyricsPlayer fileName={fileName} currentTime={currentTime} />
         </div>
     )
 }

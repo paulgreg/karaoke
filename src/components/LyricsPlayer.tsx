@@ -1,16 +1,17 @@
 import type { FindLyricsResponse } from 'lrclib-api'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { fetchLyrics } from '../service/LyricsService'
 import LyricsPrompter from './LyricsPrompter'
 
 type LyricsProps = {
-    artist?: string
-    song?: string
+    fileName?: string
     currentTime?: number
 }
 
-const LyricsPlayer: React.FC<LyricsProps> = ({ artist, song, currentTime }) => {
+const LyricsPlayer: React.FC<LyricsProps> = ({ fileName, currentTime }) => {
     const [metadata, setMetadata] = useState<FindLyricsResponse>()
+    const [fetching, setFetching] = useState(false)
+
     const artistRef = useRef<HTMLInputElement>(null)
     const songRef = useRef<HTMLInputElement>(null)
 
@@ -25,9 +26,27 @@ const LyricsPlayer: React.FC<LyricsProps> = ({ artist, song, currentTime }) => {
         const artistValue = artistRef.current?.value
         const songValue = songRef.current?.value
         if (artistValue && songValue) {
+            setFetching(true)
             fetchData(artistValue, songValue)
         }
     }
+
+    useEffect(() => {
+        if (!fileName) return
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMetadata(undefined)
+        setFetching(false)
+
+        if (!artistRef.current || !songRef.current) return
+        if (fileName.includes('-')) {
+            const [artist, song] = fileName.split('-')
+            if (artist) artistRef.current.value = artist
+            if (song) songRef.current.value = song
+        } else {
+            artistRef.current.value = ''
+            songRef.current.value = fileName
+        }
+    }, [fileName])
 
     if (!metadata) {
         return (
@@ -35,13 +54,13 @@ const LyricsPlayer: React.FC<LyricsProps> = ({ artist, song, currentTime }) => {
                 <form onSubmit={onSubmit}>
                     <fieldset>
                         <label>
-                            Artist: <input ref={artistRef} defaultValue={artist} />
+                            Artist: <input ref={artistRef} />
                         </label>
                         <label>
-                            Song: <input ref={songRef} defaultValue={song} />
+                            Song: <input ref={songRef} />
                         </label>
                     </fieldset>
-                    <input type="submit" value="fetch lyrics" />
+                    <input type="submit" value="fetch lyrics" disabled={fetching} />
                 </form>
             </div>
         )
