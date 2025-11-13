@@ -13,6 +13,19 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+body {
+    display: block;
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+}
+
 a {
     font-weight: 500;
     color: #646cff;
@@ -22,16 +35,35 @@ a:hover {
     color: #535bf2;
 }
 
-body {
-    margin: 0;
-    display: flex;
-    min-width: 320px;
-    min-height: 100vh;
+h1 {
+    font-size: 2em;
+    line-height: 1;
 }
 
-h1 {
-    font-size: 3.2em;
-    line-height: 1.1;
+h2 {
+    font-size: 1.2em;
+    line-height: 1.2em;
+    margin: 0.4em 0.2em;
+}
+
+h3 {
+    font-size: 1em;
+    line-height: 1em;
+    margin: 0.2em 0.1em;
+}
+
+label {
+    display: block;
+    margin: 1em;
+}
+
+input[type='range'] {
+    margin: auto 0.5em;
+}
+
+input[type='file'] {
+    display: block;
+    margin: 0.5em;
 }
 
 button {
@@ -51,6 +83,11 @@ button:hover {
 button:focus,
 button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
+}
+
+.error {
+    display: block;
+    color: red;
 }
 
 @media (prefers-color-scheme: light) {

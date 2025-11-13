@@ -1,0 +1,14 @@
+.lyricsContainer {
+}
+
+.plainLyrics {
+    color: #ff5733;
+    white-space: break-spaces;
+}
+
+.currentLyric {
+    display: block;
+    font-size: 2.5em;
+    color: #ff5733;
+    text-shadow: 1px 1px 2px #000000;
+}

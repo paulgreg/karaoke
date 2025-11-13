@@ -1,79 +1,70 @@
-import type { FindLyricsResponse } from 'lrclib-api'
 import React, { useEffect, useRef, useState } from 'react'
 import { fetchLyrics } from '../service/LyricsService'
-import LyricsPrompter from './LyricsPrompter'
+import { useDataContext } from '../DataContext'
 
-type LyricsProps = {
-    fileName?: string
-    currentTime?: number
-}
-
-const LyricsPlayer: React.FC<LyricsProps> = ({ fileName, currentTime }) => {
-    const [metadata, setMetadata] = useState<FindLyricsResponse>()
+const LyricsPlayer = () => {
+    const { fileName, metadata, setMetadata } = useDataContext()
     const [fetching, setFetching] = useState(false)
+    const [error, setError] = useState<string>()
 
     const artistRef = useRef<HTMLInputElement>(null)
     const songRef = useRef<HTMLInputElement>(null)
 
     const fetchData = async (artistValue: string, songValue: string) => {
-        if (artistValue && songValue) {
+        setError(undefined)
+        setFetching(true)
+        try {
             const metadata = await fetchLyrics(artistValue, songValue)
             if (metadata) setMetadata(metadata)
+        } catch (e) {
+            setError('no lyrics')
+            console.error(e)
+        } finally {
+            setFetching(false)
         }
     }
+
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         const artistValue = artistRef.current?.value
         const songValue = songRef.current?.value
         if (artistValue && songValue) {
-            setFetching(true)
             fetchData(artistValue, songValue)
         }
     }
 
     useEffect(() => {
         if (!fileName) return
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setMetadata(undefined)
         setFetching(false)
-
+        setMetadata(undefined)
         if (!artistRef.current || !songRef.current) return
-        if (fileName.includes('-')) {
-            const [artist, song] = fileName.split('-')
-            if (artist) artistRef.current.value = artist
-            if (song) songRef.current.value = song
-        } else {
-            artistRef.current.value = ''
-            songRef.current.value = fileName
-        }
-    }, [fileName])
+        artistRef.current.value = ''
+        songRef.current.value = fileName.trim()
+    }, [fileName, setMetadata])
 
     if (!metadata) {
         return (
-            <div>
-                <form onSubmit={onSubmit}>
-                    <fieldset>
-                        <label>
-                            Artist: <input ref={artistRef} />
-                        </label>
-                        <label>
-                            Song: <input ref={songRef} />
-                        </label>
-                    </fieldset>
-                    <input type="submit" value="fetch lyrics" disabled={fetching} />
-                </form>
-            </div>
+            <form onSubmit={onSubmit}>
+                <fieldset>
+                    <label>
+                        Artist: <input ref={artistRef} />
+                    </label>
+                    <label>
+                        Song: <input ref={songRef} />
+                    </label>
+                </fieldset>
+                <input type="submit" value="fetch lyrics" disabled={fetching} />
+                {error && <strong className="error">{error}</strong>}
+            </form>
         )
     }
 
     return (
-        <div>
-            <h2>{metadata?.artistName}</h2>
-            <h3>
-                {metadata?.albumName} - {metadata?.trackName}
-            </h3>
-            <LyricsPrompter metadata={metadata} currentTime={currentTime} />
-        </div>
+        <>
+            <h3>{metadata?.artistName}</h3>
+            <h3>{metadata?.albumName}</h3>
+            <h2>{metadata?.trackName}</h2>
+        </>
     )
 }
 

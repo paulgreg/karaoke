@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
-import LyricsPlayer from './LyricsPlayer'
+import { useDataContext } from '../DataContext'
+import s from './SongSelector.module.css'
+
+const fileRegEx = /^(.+)\.(mp3|m4a|ogg)$/
 
 const SongSelector = () => {
-    const [audioSrc, setAudioSrc] = useState<string>()
-    const [fileName, setFileName] = useState<string>()
+    const { setFileName, setAudioSrc } = useDataContext()
     const [error, setError] = useState('')
-    const [currentTime, setCurrentTime] = useState<number>(0)
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setAudioSrc(undefined)
 
         const files = e.target.files
@@ -15,15 +16,18 @@ const SongSelector = () => {
             const file = files[0]
             try {
                 const { name } = file
-                const [n] = name.split('.')
-                setFileName(n)
-                setError('')
+                const match = fileRegEx.exec(name)
+                if (match) {
+                    setFileName(match[1])
+                    setError('')
 
-                const src = URL.createObjectURL(file)
-                setTimeout(() => {
-                    // Add a slight delay to ensure the component fully resets
-                    setAudioSrc(src)
-                }, 0)
+                    const src = URL.createObjectURL(file)
+                    setTimeout(() => {
+                        setAudioSrc(src)
+                    }, 0)
+                } else {
+                    setError('no match')
+                }
             } catch (err) {
                 setError('Failed to extract metadata')
                 console.error(err)
@@ -31,28 +35,13 @@ const SongSelector = () => {
         }
     }
 
-    const handleTimeUpdate = (e: React.SyntheticEvent<HTMLAudioElement, Event>) => {
-        setCurrentTime(e.currentTarget.currentTime)
-    }
-
     return (
-        <div>
-            <div>
-                <input type="file" accept=".mp3,.m4a,ogg" onChange={handleFileChange} />
-            </div>
+        <div className={s.songSelectorContainer}>
+            <input type="file" accept=".mp3,.m4a,ogg" onChange={onFileChange} />
             <p>
-                {error && <strong style={{ color: 'red' }}>{error}</strong>}
-                {!error && <small>artist - song name.mp3/m4a/ogg</small>}
+                {error && <strong className="error">{error}</strong>}
+                {!error && <small>mp3/m4a/ogg</small>}
             </p>
-            <div>
-                {audioSrc && (
-                    <audio controls onTimeUpdate={handleTimeUpdate}>
-                        <source src={audioSrc} type="audio/mpeg" />
-                        Your browser does not support the audio element.
-                    </audio>
-                )}
-            </div>
-            <LyricsPlayer fileName={fileName} currentTime={currentTime} />
         </div>
     )
 }
