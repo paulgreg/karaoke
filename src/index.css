@@ -38,6 +38,7 @@ a:hover {
 h1 {
     font-size: 2em;
     line-height: 1;
+    margin: 0.4em 0.2em;
 }
 
 h2 {
@@ -83,6 +84,12 @@ button:hover {
 button:focus,
 button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
+}
+
+footer {
+    position: fixed;
+    bottom: 0.25em;
+    right: 0.5em;
 }
 
 .error {

@@ -18,6 +18,9 @@ const App = () => (
             </div>
             <LyricsPrompter />
         </main>
+        <footer>
+            <a href="https://github.com/paulgreg/karaoke">source code</a>
+        </footer>
     </DataContextProvider>
 )
 

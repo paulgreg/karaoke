@@ -54,7 +54,7 @@ const LyricsPrompter = () => {
         )
     }
 
-    return <></>
+    return <div className={s.lyricsContainer}></div>
 }
 
 export default LyricsPrompter
