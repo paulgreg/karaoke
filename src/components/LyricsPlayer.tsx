@@ -29,7 +29,7 @@ const LyricsPlayer = () => {
         const artistValue = artistRef.current?.value
         const songValue = songRef.current?.value
         if (artistValue && songValue) {
-            fetchData(artistValue, songValue)
+            fetchData(artistValue.trim(), songValue.trim())
         }
     }
 
