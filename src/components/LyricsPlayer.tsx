@@ -14,8 +14,8 @@ const LyricsPlayer = () => {
         setError(undefined)
         setFetching(true)
         try {
-            const metadata = await fetchLyrics(artistValue, songValue)
-            if (metadata) setMetadata(metadata)
+            const meta = await fetchLyrics(artistValue, songValue)
+            if (meta) setMetadata(meta)
         } catch (e) {
             setError('no lyrics')
             console.error(e)
@@ -37,9 +37,11 @@ const LyricsPlayer = () => {
         if (!fileName) return
         setFetching(false)
         setMetadata(undefined)
-        if (!artistRef.current || !songRef.current) return
-        artistRef.current.value = ''
-        songRef.current.value = fileName.trim()
+        setTimeout(() => {
+            if (!artistRef.current || !songRef.current) return
+            artistRef.current.value = ''
+            songRef.current.value = fileName.trim()
+        }, 0)
     }, [fileName, setMetadata])
 
     if (!metadata) {

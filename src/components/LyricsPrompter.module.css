@@ -13,3 +13,8 @@
     color: #ff5733;
     text-shadow: 1px 1px 2px #000000;
 }
+
+.time {
+    font-size: 2em;
+    color: orange;
+}

@@ -5,11 +5,12 @@ import s from './SongSelector.module.css'
 const fileRegEx = /^(.+)\.(mp3|m4a|ogg)$/
 
 const SongSelector = () => {
-    const { setFileName, setAudioSrc } = useDataContext()
+    const { setFileName, setAudioSrc, setCurrentTime } = useDataContext()
     const [error, setError] = useState('')
 
     const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setAudioSrc(undefined)
+        setError('')
 
         const files = e.target.files
         if (files?.length) {
@@ -19,10 +20,10 @@ const SongSelector = () => {
                 const match = fileRegEx.exec(name)
                 if (match) {
                     setFileName(match[1])
-                    setError('')
 
                     const src = URL.createObjectURL(file)
                     setTimeout(() => {
+                        setCurrentTime(0)
                         setAudioSrc(src)
                     }, 0)
                 } else {
