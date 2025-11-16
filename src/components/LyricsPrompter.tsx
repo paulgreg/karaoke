@@ -7,7 +7,12 @@ const LyricsPrompter = () => {
     const [idx, setIdx] = useState(0)
 
     useEffect(() => {
-        if (!syncLyrics?.length) return
+        if (!syncLyrics?.length) {
+            setTimeout(() => {
+                setIdx(0)
+            }, 0)
+            return
+        }
         const i = syncLyrics.findIndex(({ timecode }) => Math.floor(currentTime) === Math.floor(timecode))
         if (i !== -1) {
             setTimeout(() => {
@@ -20,8 +25,8 @@ const LyricsPrompter = () => {
         const currentLyric = syncLyrics[idx]
         return (
             <div className={s.lyricsContainer}>
-                {currentLyric?.time && <time className={s.time}>at {currentLyric?.time}</time>}
-                <strong className={s.currentLyric}>{currentLyric?.lyric ?? ''}</strong>
+                {currentLyric?.lyric && currentLyric?.time && <time className={s.time}>at {currentLyric?.time}</time>}
+                <cite className={s.currentLyric}>{currentLyric?.lyric ?? ''}</cite>
             </div>
         )
     }

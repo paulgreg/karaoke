@@ -42,7 +42,7 @@ const DataContextProvider: React.FC<DataContextProviderPropsType> = ({ children 
                               lyric,
                           } as SyncLyricType
                       } else {
-                          return { time: '', timecode: 0, lyric: 'error' } as SyncLyricType
+                          return { time: '', timecode: 0, lyric: '' } as SyncLyricType
                       }
                   })
                 : ([] as SyncLyricType[]),

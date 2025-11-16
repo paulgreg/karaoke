@@ -49,10 +49,10 @@ const LyricsPlayer = () => {
             <form onSubmit={onSubmit}>
                 <fieldset>
                     <label>
-                        Artist: <input ref={artistRef} />
+                        Artist: <input name="artist" ref={artistRef} autoComplete="on" />
                     </label>
                     <label>
-                        Song: <input ref={songRef} />
+                        Song: <input name="song" ref={songRef} autoComplete="on" />
                     </label>
                 </fieldset>
                 <input type="submit" value="fetch lyrics" disabled={fetching} />

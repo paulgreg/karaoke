@@ -20,10 +20,10 @@ const SongSelector = () => {
                 const match = fileRegEx.exec(name)
                 if (match) {
                     setFileName(match[1])
+                    setCurrentTime(0)
 
                     const src = URL.createObjectURL(file)
                     setTimeout(() => {
-                        setCurrentTime(0)
                         setAudioSrc(src)
                     }, 0)
                 } else {
@@ -38,10 +38,10 @@ const SongSelector = () => {
 
     return (
         <div className={s.songSelectorContainer}>
-            <input type="file" accept=".mp3,.m4a,ogg" onChange={onFileChange} />
+            <input type="file" accept=".mp3,.m4a,ogg" className={s.fileInput} onChange={onFileChange} />
             <p>
                 {error && <strong className="error">{error}</strong>}
-                {!error && <small>mp3/m4a/ogg</small>}
+                {!error && <small className={s.message}>mp3/m4a/ogg</small>}
             </p>
         </div>
     )

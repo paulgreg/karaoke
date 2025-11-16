@@ -50,16 +50,12 @@ h2 {
 h3 {
     font-size: 1em;
     line-height: 1em;
-    margin: 0.2em 0.1em;
+    margin: 0.4em 0.2em;
 }
 
 label {
     display: block;
     margin: 1em;
-}
-
-input[type='range'] {
-    margin: auto 0.5em;
 }
 
 input[type='file'] {

@@ -1,3 +1,4 @@
+import React from 'react'
 import { useDataContext } from '../DataContext'
 import s from './AudioPlayer.module.css'
 
@@ -14,7 +15,7 @@ const AudioPlayer = () => {
                     <source src={audioSrc} type="audio/mpeg" />
                     Your browser does not support the audio element.
                 </audio>
-            )}{' '}
+            )}
         </div>
     )
 }
