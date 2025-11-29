@@ -11,15 +11,36 @@
 .time {
     display: block;
     margin-top: 0.5em;
-    font-size: 2em;
+    font-size: 1.25em;
+    min-height: 1.5em;
     color: #ff5733;
 }
 
 .currentLyric {
-    margin-top: 0.25em;
+    margin: 0.25em auto 1em auto;
     display: block;
     font-weight: bold;
-    font-size: 2.5em;
+    font-size: 1.5em;
     color: #ff5733;
     text-shadow: 1px 1px 2px #000000;
+    min-height: 6em;
+}
+
+@media (min-width: 800px) {
+    .currentLyric {
+        font-size: 2.5em;
+        min-height: 5em;
+    }
+}
+
+@media (min-width: 1000px) {
+    .currentLyric {
+        min-height: 4em;
+    }
+}
+
+@media (min-width: 1200px) {
+    .currentLyric {
+        min-height: 3em;
+    }
 }

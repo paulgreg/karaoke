@@ -25,8 +25,11 @@ const LyricsPrompter = () => {
         const currentLyric = syncLyrics[idx]
         return (
             <div className={s.lyricsContainer}>
-                {currentLyric?.lyric && currentLyric?.time && <time className={s.time}>at {currentLyric?.time}</time>}
+                <time className={s.time}>
+                    {currentLyric?.lyric && currentLyric?.time && <>at {currentLyric?.time}</>}
+                </time>
                 <cite className={s.currentLyric}>{currentLyric?.lyric ?? ''}</cite>
+                <code className={s.plainLyrics}>{plainLyrics}</code>
             </div>
         )
     }
