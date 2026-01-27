@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { fetchLyrics } from '../service/LyricsService'
 import { useDataContext } from '../DataContext'
+import { fetchArtistAndSongNames } from '../service/Store'
 
 const LyricsPlayer = () => {
     const { fileName, metadata, setMetadata } = useDataContext()
@@ -10,11 +11,11 @@ const LyricsPlayer = () => {
     const artistRef = useRef<HTMLInputElement>(null)
     const songRef = useRef<HTMLInputElement>(null)
 
-    const fetchData = async (artistValue: string, songValue: string) => {
+    const fetchData = async (fileName: string, artistValue: string, songValue: string) => {
         setError(undefined)
         setFetching(true)
         try {
-            const meta = await fetchLyrics(artistValue, songValue)
+            const meta = await fetchLyrics(fileName, artistValue, songValue)
             if (meta) setMetadata(meta)
         } catch (e) {
             setError('no lyrics')
@@ -24,12 +25,12 @@ const LyricsPlayer = () => {
         }
     }
 
-    const onSubmit = (e: React.FormEvent) => {
+    const onSubmit = (e: React.SubmitEvent) => {
         e.preventDefault()
         const artistValue = artistRef.current?.value
         const songValue = songRef.current?.value
-        if (artistValue && songValue) {
-            fetchData(artistValue.trim(), songValue.trim())
+        if (fileName && artistValue && songValue) {
+            fetchData(fileName.trim(), artistValue.trim(), songValue.trim())
         }
     }
 
@@ -41,6 +42,9 @@ const LyricsPlayer = () => {
             if (!artistRef.current || !songRef.current) return
             artistRef.current.value = ''
             songRef.current.value = fileName.trim()
+            const { artist, song } = fetchArtistAndSongNames(fileName) ?? {}
+            if (artist) artistRef.current.value = artist
+            if (song) songRef.current.value = song
         }, 0)
     }, [fileName, setMetadata])
 
