@@ -1,9 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react'
 import { fetchLyrics } from '../service/LyricsService'
 import { useDataContext } from '../DataContext'
 import { fetchArtistAndSongNames } from '../service/Store'
+import type { FindLyricsResponse } from 'lrclib-api'
 
-const LyricsPlayer = () => {
+interface LyricsPlayerProps {
+    audioMetadata?: AudioMetadata
+}
+
+interface LyricsPlayerRef {
+    fetchLyricsData: (artistValue: string, songValue: string) => Promise<FindLyricsResponse | null>
+}
+
+const LyricsPlayer = forwardRef<LyricsPlayerRef, LyricsPlayerProps>((props, ref) => {
+    const { audioMetadata } = props
     const { fileName, metadata, setMetadata } = useDataContext()
     const [fetching, setFetching] = useState(false)
     const [error, setError] = useState<string>()
@@ -15,14 +25,23 @@ const LyricsPlayer = () => {
         setError(undefined)
         setFetching(true)
         try {
-            const meta = await fetchLyrics(fileName, artistValue, songValue)
+            const meta = await fetchLyrics(fileName, artistValue, songValue, audioMetadata)
             if (meta) setMetadata(meta)
+            return meta
         } catch (e) {
             setError('no lyrics')
             console.error(e)
+            throw e
         } finally {
             setFetching(false)
         }
+    }
+
+    const fetchLyricsData = async (artistValue: string, songValue: string) => {
+        if (fileName) {
+            return fetchData(fileName, artistValue, songValue)
+        }
+        throw new Error('No file selected')
     }
 
     const onSubmit = (e: React.SubmitEvent) => {
@@ -36,17 +55,32 @@ const LyricsPlayer = () => {
 
     useEffect(() => {
         if (!fileName) return
-        setFetching(false)
-        setMetadata(undefined)
         setTimeout(() => {
+            setMetadata(undefined)
             if (!artistRef.current || !songRef.current) return
+
             artistRef.current.value = ''
             songRef.current.value = fileName.trim()
-            const { artist, song } = fetchArtistAndSongNames(fileName) ?? {}
-            if (artist) artistRef.current.value = artist
-            if (song) songRef.current.value = song
+
+            const { artist: storedArtist, song: storedSong } = fetchArtistAndSongNames(fileName) ?? {}
+
+            if (audioMetadata?.artist) {
+                artistRef.current.value = audioMetadata.artist
+            } else if (storedArtist) {
+                artistRef.current.value = storedArtist
+            }
+
+            if (audioMetadata?.title) {
+                songRef.current.value = audioMetadata.title
+            } else if (storedSong) {
+                songRef.current.value = storedSong
+            }
         }, 0)
-    }, [fileName, setMetadata])
+    }, [fileName, setMetadata, audioMetadata])
+
+    useImperativeHandle(ref, () => ({
+        fetchLyricsData,
+    }))
 
     if (!metadata) {
         return (
@@ -59,7 +93,7 @@ const LyricsPlayer = () => {
                         Song: <input name="song" ref={songRef} autoComplete="on" />
                     </label>
                 </fieldset>
-                <input type="submit" value="fetch lyrics" disabled={fetching} />
+                <input type="submit" value={fetching ? 'Fetching...' : 'fetch lyrics'} disabled={fetching} />
                 {error && <strong className="error">{error}</strong>}
             </form>
         )
@@ -72,6 +106,6 @@ const LyricsPlayer = () => {
             <h2>{metadata?.trackName}</h2>
         </>
     )
-}
+})
 
 export default LyricsPlayer

@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { useDataContext } from '../DataContext'
+import { extractAudioMetadata } from '../service/MetadataService'
 import s from './SongSelector.module.css'
 
-const fileRegEx = /^(.+)\.(mp3|m4a|ogg)$/
+interface SongSelectorProps {
+    onFileUploaded: (metadata: AudioMetadata) => void
+}
 
-const SongSelector = () => {
+const SongSelector: React.FC<SongSelectorProps> = ({ onFileUploaded }) => {
     const { setFileName, setAudioSrc, setCurrentTime } = useDataContext()
     const [error, setError] = useState('')
 
@@ -17,18 +20,16 @@ const SongSelector = () => {
             const file = files[0]
             try {
                 const { name } = file
-                const match = fileRegEx.exec(name)
-                if (match) {
-                    setFileName(match[1])
-                    setCurrentTime(0)
+                setFileName(name)
+                setCurrentTime(0)
 
-                    const src = URL.createObjectURL(file)
-                    setTimeout(() => {
-                        setAudioSrc(src)
-                    }, 0)
-                } else {
-                    setError('no match')
-                }
+                const src = URL.createObjectURL(file)
+                setTimeout(() => {
+                    setAudioSrc(src)
+                }, 0)
+
+                const metadata = await extractAudioMetadata(file)
+                onFileUploaded(metadata)
             } catch (err) {
                 setError('Failed to extract metadata')
                 console.error(err)
@@ -38,7 +39,7 @@ const SongSelector = () => {
 
     return (
         <div className={s.songSelectorContainer}>
-            <input type="file" accept=".mp3,.m4a,ogg" className={s.fileInput} onChange={onFileChange} />
+            <input type="file" accept="audio/*" className={s.fileInput} onChange={onFileChange} />
             <p>
                 {error && <strong className="error">{error}</strong>}
                 {!error && <small className={s.message}>mp3/m4a/ogg</small>}
